@@ -9,6 +9,7 @@ local Remotes = RS:WaitForChild("Remotes")
 local Sounds = RS:WaitForChild("DreamSounds")
 local map = workspace:WaitForChild("DreamMap")
 
+do local o = plr:WaitForChild("PlayerGui"):FindFirstChild("DreamPolish") if o then o:Destroy() end for _, m in ipairs(workspace:GetChildren()) do if m.Name == "ShadowStudent" then m:Destroy() end end end -- bản cũ của script
 local gui = Instance.new("ScreenGui") gui.Name = "DreamPolish" gui.ResetOnSpawn = false gui.IgnoreGuiInset = true gui.DisplayOrder = 5
 gui.Parent = plr:WaitForChild("PlayerGui")
 
@@ -486,4 +487,18 @@ task.spawn(function()
 			if vis then g.Transparency = 0.15 + (math.sin(t * 2.5 + i) + 1) * 0.12 end
 		end
 	end
+end)
+
+-- ===== MAP ĐƯỢC LÀM MỚI =====
+-- Mỗi lần vào màn, server xóa map cũ và clone map mới: chạy lại script này để gắn với map mới.
+local myMap = map
+local reloading = false
+workspace.ChildAdded:Connect(function(c)
+	if reloading or c.Name ~= "DreamMap" or c == myMap then return end
+	reloading = true
+	task.spawn(function()
+		-- chờ map cũ bị đổi tên / xóa hẳn, để bản chạy lại chắc chắn tìm thấy map MỚI
+		while myMap and myMap.Parent == workspace and myMap.Name == "DreamMap" do task.wait() end
+		local s = script:Clone() s.Parent = script.Parent script:Destroy()
+	end)
 end)

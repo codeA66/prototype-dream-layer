@@ -568,4 +568,38 @@ if RunService:IsStudio() then
 	end
 end
 
+-- ===== MAP SẠCH MỖI LẦN VÀO MÀN =====
+-- Bản gốc của mỗi map được cất trong ServerStorage.MapTemplates ngay khi server khởi động.
+-- Mỗi lần bắt đầu / chơi lại một tầng: xóa map cũ, clone bản gốc ra Workspace,
+-- rồi chạy lại script của tầng từ đầu (script cũ bị xóa → mọi vòng lặp, kết nối, trạng thái cũ biến mất).
+local SSv = game:GetService("ServerStorage")
+local function templates()
+	local f = SSv:FindFirstChild("MapTemplates")
+	if not f then f = Instance.new("Folder") f.Name = "MapTemplates" f.Parent = SSv end
+	return f
+end
+-- Gọi ở ĐẦU script tầng, trước khi script sửa gì vào map. Trả về map đang dùng trong Workspace.
+function Core.mapTemplate(name)
+	local live = workspace:WaitForChild(name)
+	local f = templates()
+	if not f:FindFirstChild(name) then local t = live:Clone() t.Parent = f end
+	return live
+end
+-- Xóa map cũ, clone map mới, chạy lại script tầng với chế độ "start".
+function Core.reloadLevel(levelScript, name)
+	local tpl = templates():FindFirstChild(name)
+	local old = workspace:FindFirstChild(name)
+	if tpl then
+		local new = tpl:Clone()
+		if old then old.Name = name .. "_old" end
+		new.Parent = workspace
+		if old then old:Destroy() end
+	end
+	if Core.log then Core.log("reload", nil, name) end
+	local s = levelScript:Clone()
+	s:SetAttribute("Boot", "start")
+	s.Parent = levelScript.Parent
+	levelScript:Destroy()
+end
+
 return Core

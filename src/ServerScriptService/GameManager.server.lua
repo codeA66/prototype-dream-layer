@@ -4,7 +4,7 @@ local RS = game:GetService("ReplicatedStorage")
 local Debris = game:GetService("Debris")
 local Remotes = RS:WaitForChild("Remotes")
 local Core = require(game:GetService("ServerScriptService"):WaitForChild("LevelCore"))
-local map = workspace:WaitForChild("DreamMap")
+local map = Core.mapTemplate("DreamMap") -- cất bản gốc trước khi sửa map; mỗi lần vào màn sẽ clone lại
 local IX = map.Interactables
 local Z = map.Zones
 
@@ -432,13 +432,7 @@ local function onDream(p)
 	end
 	if carrier == p then dropNotebook("Người cầm sổ đã hòa mộng — sổ quay về chỗ cũ!") end
 end
-Players.PlayerAdded:Connect(function(p)
-	p:SetAttribute("Role", nil) p:SetAttribute("Ready", false)
-	-- vào giữa ván: tự nhận vai còn trống để chơi cùng luôn
-	if G("Phase") ~= "Lobby" then
-		for _, r in ipairs(ROLE_ORDER) do if ROLES[r].enabled and not roleTaken(r, p) then p:SetAttribute("Role", r) break end end
-	end
-	p:SetAttribute("Sanity", maxSan(p)) p:SetAttribute("Dreaming", false) p:SetAttribute("SkillReadyAt", 0)
+local function hookCharacter(p)
 	p.CharacterAdded:Connect(function(char)
 		task.wait(0.2)		-- CHẾ ĐỘ TEST TẦNG 2 (chỉ trong Studio): bật thuộc tính TestLevel2 của Workspace
 		if game:GetService("RunService"):IsStudio() and workspace:GetAttribute("TestLevel2") then
@@ -457,7 +451,18 @@ Players.PlayerAdded:Connect(function(p)
 			end
 		end)
 	end)
+end
+Players.PlayerAdded:Connect(function(p)
+	p:SetAttribute("Role", nil) p:SetAttribute("Ready", false)
+	-- vào giữa ván: tự nhận vai còn trống để chơi cùng luôn
+	if G("Phase") ~= "Lobby" then
+		for _, r in ipairs(ROLE_ORDER) do if ROLES[r].enabled and not roleTaken(r, p) then p:SetAttribute("Role", r) break end end
+	end
+	p:SetAttribute("Sanity", maxSan(p)) p:SetAttribute("Dreaming", false) p:SetAttribute("SkillReadyAt", 0)
+	hookCharacter(p)
 end)
+-- script được chạy lại khi làm mới map: gắn lại cho người chơi đang có mặt
+for _, p in ipairs(Players:GetPlayers()) do hookCharacter(p) end
 Players.PlayerRemoving:Connect(function(p)
 	if carrier == p then dropNotebook() end
 	view[p] = nil p:SetAttribute("Role", nil)
@@ -906,7 +911,7 @@ if game:GetService("RunService"):IsStudio() then
 		step = function() return currentTask and currentTask.id end,
 		finishStep = function() finishTask(true) end,
 	}
-	local bf = Instance.new("BindableFunction") bf.Name = "DreamDebug" bf.Parent = game:GetService("ServerStorage")
+	local bf = game:GetService("ServerStorage"):FindFirstChild("DreamDebug") or Instance.new("BindableFunction") bf.Name = "DreamDebug" bf.Parent = game:GetService("ServerStorage")
 	bf.OnInvoke = function(cmd, ...) return api[cmd](...) end
 end
 
@@ -988,7 +993,7 @@ end
 -- ===== ĐĂNG KÝ TẦNG 1 VỚI LEVELCORE =====
 Core.register(1, {
 	S = S, G = G, state = State, escape = escape,
-	name = "Lớp Học Vỡ", start = resetRound, loseRestart = false,
+	name = "Lớp Học Vỡ", start = function() Core.reloadLevel(script, "DreamMap") end, loseRestart = false, -- mỗi lần vào màn: map mới + script mới
 	tools = {"ToNoiQuy", "HopPhan", "SoDiem", "NhatKy"},
 	active = function() return not G("RoundOver") end,
 	sleep = function() S("RoundOver", true) S("Phase", "Away") setTask(nil) clearTaskItems() if roll then endRoll() end end,
@@ -1010,13 +1015,14 @@ Core.register(1, {
 })
 Core.lobbyFn = enterLobby
 wire()
-enterLobby()
+local BOOT = script:GetAttribute("Boot") -- "start": vừa được chạy lại để vào màn với map mới
+if BOOT == "start" then resetRound() else enterLobby() end
 do
 	local SSv = game:GetService("ServerStorage")
 	local back = SSv:FindFirstChild("BackToLobby") or Instance.new("BindableEvent", SSv) back.Name = "BackToLobby"
 	back.Event:Connect(function() Core.toLobby() end)
 	local tl = Core.testLevel()
-	if tl and tl ~= 1 then S("RoundOver", true) S("Phase", "Away") task.delay(3, function() Core.startLevel(tl) end) end
+	if not BOOT and tl and tl ~= 1 then S("RoundOver", true) S("Phase", "Away") task.delay(3, function() Core.startLevel(tl) end) end
 end
 while true do
 	task.wait(TICK)

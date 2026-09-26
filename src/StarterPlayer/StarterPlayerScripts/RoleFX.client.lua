@@ -225,8 +225,8 @@ local function setHL(key, inst, on, color)
 	elseif h then h.Enabled = false end
 end
 local ENEMIES = {
-	[1] = function() local IX = workspace.DreamMap.Interactables return {IX:FindFirstChild("Teacher"), IX:FindFirstChild("Librarian"), IX:FindFirstChild("Puppet")} end,
-	[2] = function() local IX = workspace.DreamMap2.Interactables return {IX:FindFirstChild("Doctor"), IX:FindFirstChild("Keeper"), IX:FindFirstChild("PatientZero")} end,
+	[1] = function() local m = workspace:FindFirstChild("DreamMap") if not m then return {} end local IX = m.Interactables return {IX:FindFirstChild("Teacher"), IX:FindFirstChild("Librarian"), IX:FindFirstChild("Puppet")} end,
+	[2] = function() local m = workspace:FindFirstChild("DreamMap2") if not m then return {} end local IX = m.Interactables return {IX:FindFirstChild("Doctor"), IX:FindFirstChild("Keeper"), IX:FindFirstChild("PatientZero")} end,
 }
 
 RunService.RenderStepped:Connect(function()
@@ -271,6 +271,7 @@ RunService.RenderStepped:Connect(function()
 	local root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 	local seerEye = role == "Seer" and root and not plr:GetAttribute("Dreaming") and l
 	local loot = {}
+	if seerEye and not workspace:FindFirstChild(l == 1 and "DreamMap" or "DreamMap2") then seerEye = false end -- map đang được làm mới
 	if seerEye then
 		if l == 1 then
 			local IX = workspace.DreamMap.Interactables

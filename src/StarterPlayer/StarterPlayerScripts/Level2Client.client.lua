@@ -9,6 +9,7 @@ local ST = RS:WaitForChild("GameState2")
 local map = workspace:WaitForChild("DreamMap2")
 local IX = map:WaitForChild("Interactables")
 
+do local o = plr:WaitForChild("PlayerGui"):FindFirstChild("Level2Gui") if o then o:Destroy() end end -- bản cũ của script
 local gui = Instance.new("ScreenGui") gui.Name = "Level2Gui" gui.ResetOnSpawn = false gui.IgnoreGuiInset = true gui.DisplayOrder = 8
 gui.Parent = plr:WaitForChild("PlayerGui")
 local function txt(parent, pos, size, text, ts, font)
@@ -283,4 +284,18 @@ task.spawn(function()
 			l1amb.Volume = on and l1amb:GetAttribute("BaseVol") * 0.35 or l1amb:GetAttribute("BaseVol")
 		end
 	end
+end)
+
+-- ===== MAP ĐƯỢC LÀM MỚI =====
+-- Mỗi lần vào màn, server xóa map cũ và clone map mới: chạy lại script này để gắn với map mới.
+local myMap = map
+local reloading = false
+workspace.ChildAdded:Connect(function(c)
+	if reloading or c.Name ~= "DreamMap2" or c == myMap then return end
+	reloading = true
+	task.spawn(function()
+		-- chờ map cũ bị đổi tên / xóa hẳn, để bản chạy lại chắc chắn tìm thấy map MỚI
+		while myMap and myMap.Parent == workspace and myMap.Name == "DreamMap2" do task.wait() end
+		local s = script:Clone() s.Parent = script.Parent script:Destroy()
+	end)
 end)

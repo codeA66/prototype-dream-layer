@@ -5,7 +5,7 @@ local SS = game:GetService("ServerStorage")
 local RunService = game:GetService("RunService")
 local Remotes = RS:WaitForChild("Remotes")
 local Core = require(game:GetService("ServerScriptService"):WaitForChild("LevelCore"))
-local map = workspace:WaitForChild("DreamMap2")
+local map = Core.mapTemplate("DreamMap2") -- cất bản gốc trước khi sửa map; mỗi lần vào màn sẽ clone lại
 local IX = map.Interactables
 local Z = map.Zones
 
@@ -585,7 +585,7 @@ end
 -- ===== ĐĂNG KÝ TẦNG 2 VỚI LEVELCORE =====
 Core.register(2, {
 	S = S, G = G, state = ST, escape = escape,
-	name = "Bệnh Viện Ngủ Quên", start = startLevel2, loseRestart = true,
+	name = "Bệnh Viện Ngủ Quên", start = function() Core.reloadLevel(script, "DreamMap2") end, loseRestart = true, -- mỗi lần vào màn: map mới + script mới
 	sleep = function() S("Phase", "Idle") end,
 	active = active,
 	debug = { -- chỉ dùng khi test trong Studio
@@ -607,12 +607,15 @@ Core.register(2, {
 
 -- ===== TICK CHÍNH =====
 local TICK = 0.25
-Players.PlayerAdded:Connect(function(p)
+local function hookCharacter(p)
 	p.CharacterAdded:Connect(function(char)
 		task.wait(0.3)
 		if inL2(p) then spawnAt(p) end
 	end)
-end)
+end
+Players.PlayerAdded:Connect(hookCharacter)
+for _, p in ipairs(Players:GetPlayers()) do hookCharacter(p) end -- script được chạy lại khi làm mới map
+if script:GetAttribute("Boot") == "start" then task.defer(startLevel2) end
 
 while true do
 	task.wait(TICK)

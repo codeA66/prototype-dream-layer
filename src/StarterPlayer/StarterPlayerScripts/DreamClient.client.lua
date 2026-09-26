@@ -22,6 +22,7 @@ local PHASE_TEXT = {
 }
 
 -- ===== GUI =====
+do local o = plr:WaitForChild("PlayerGui"):FindFirstChild("DreamHUD") if o then o:Destroy() end local c = Lighting:FindFirstChild("DreamHUD_CC") if c then c:Destroy() end end -- bản cũ của script (trước khi làm mới map)
 local gui = Instance.new("ScreenGui") gui.Name = "DreamHUD" gui.ResetOnSpawn = false gui.IgnoreGuiInset = true gui.Parent = plr:WaitForChild("PlayerGui")
 local function label(parent, pos, size, text, sizeT)
 	local t = Instance.new("TextLabel") t.Parent = parent t.Position = pos t.Size = size t.BackgroundTransparency = 1
@@ -94,7 +95,7 @@ local function pushMsg(msg, color)
 end
 Remotes.Notify.OnClientEvent:Connect(function(msg) if msg ~= "__SHOW_RULES__" and msg ~= "__DIARY__" and msg ~= "__DIARY2__" and msg:sub(1, 10) ~= "__MEMORY__" and msg:sub(1, 9) ~= "__DANCE__" then pushMsg(msg) end end)
 
-local cc = Instance.new("ColorCorrectionEffect") cc.Parent = Lighting
+local cc = Instance.new("ColorCorrectionEffect") cc.Name = "DreamHUD_CC" cc.Parent = Lighting
 
 for _, l in ipairs({roleL, skillL, infoL, helpL, phaseL, taskL, itemL, musicL}) do l.Visible = false end
 musicL.Visible = false musicL.TextSize = 14 musicL.Position = UDim2.new(0.5, -300, 1, -118)
@@ -280,10 +281,24 @@ RunService.RenderStepped:Connect(function()
 	setXray(IX.TaskBook, sight and IX.TaskBook.Transparency < 1 and here(IX.TaskBook), gold)
 	setXray(IX.Notebook, sight and IX.Notebook.Transparency < 1 and here(IX.Notebook), Color3.fromRGB(255, 120, 80))
 	for _, n in ipairs({"Shard1", "Shard2", "Shard3"}) do setXray(IX[n], sight and IX[n].Transparency < 1 and here(IX[n]), Color3.fromRGB(120, 200, 255)) end
-	local itemsF = workspace.DreamMap:FindFirstChild("Items")
+	local itemsF = IX.Parent and IX.Parent:FindFirstChild("Items")
 	if itemsF then for _, it in ipairs(itemsF:GetChildren()) do setXray(it, sight and here(it), Color3.fromRGB(140, 255, 160)) end end
 	for inst in pairs(xray) do if not inst.Parent then setXray(inst, false) end end
 	-- Bình tâm
 	local calm = (plr:GetAttribute("CalmUntil") or 0) - now
 	calmL.Text = calm > 0 and ("🛡 Bình tâm " .. math.ceil(calm) .. "s — miễn 1 lần phạt luật") or ""
+end)
+
+-- ===== MAP ĐƯỢC LÀM MỚI =====
+-- Mỗi lần vào màn, server xóa map cũ và clone map mới: chạy lại script này để gắn với map mới.
+local myMap = IX.Parent
+local reloading = false
+workspace.ChildAdded:Connect(function(c)
+	if reloading or c.Name ~= "DreamMap" or c == myMap then return end
+	reloading = true
+	task.spawn(function()
+		-- chờ map cũ bị đổi tên / xóa hẳn, để bản chạy lại chắc chắn tìm thấy map MỚI
+		while myMap and myMap.Parent == workspace and myMap.Name == "DreamMap" do task.wait() end
+		local s = script:Clone() s.Parent = script.Parent script:Destroy()
+	end)
 end)
