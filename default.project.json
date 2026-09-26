@@ -12,7 +12,7 @@
         ],
         "Brightness": 0.5,
         "EnvironmentDiffuseScale": 0.30000001192092896,
-        "EnvironmentSpecularScale": 0.5,
+        "EnvironmentSpecularScale": 0.0,
         "FogColor": [
           0.03921568766236305,
           0.0313725508749485,
