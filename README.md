@@ -27,3 +27,13 @@ docs/
 
 Tên file theo quy ước Rojo (`.server.lua` = Script, `.client.lua` = LocalScript, `.lua` = ModuleScript).
 Map, âm thanh, Remotes nằm trong file place của Roblox Studio, không có trong repo.
+
+## Làm việc với Rojo
+
+1. Cài VS Code + extension **Rojo** (extension sẽ cài plugin Rojo cho Studio).
+2. Mở thư mục repo trong VS Code → `Ctrl+Shift+P` → **Rojo: Start server**.
+3. Mở place trong Studio → tab **Plugins → Rojo → Connect**.
+4. Sửa code trong `src/` bằng VS Code, Studio tự cập nhật. **Không sửa script trong Studio** (sẽ bị Rojo ghi đè).
+5. Commit + push bằng GitHub Desktop hoặc `git`.
+
+Map, quái, âm thanh, Remotes vẫn nằm trong file place (`.rbxl`).
