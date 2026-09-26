@@ -37,3 +37,27 @@ Map, âm thanh, Remotes nằm trong file place của Roblox Studio, không có t
 5. Commit + push bằng GitHub Desktop hoặc `git`.
 
 Map, quái, âm thanh, Remotes vẫn nằm trong file place (`.rbxl`).
+
+## Map và đối tượng trong game (Rojo syncback)
+
+Repo chứa cả map và đối tượng, `rojo build -o DreamLayers.rbxl` dựng lại được cả game.
+
+| Thư mục | Nội dung |
+|---|---|
+| `map/DreamMap.rbxm`, `map/DreamMap2.rbxm` | Map Tầng 1, Tầng 2 |
+| `shared/Remotes`, `shared/DreamSounds`, `shared/L2Ambience.rbxm` | ReplicatedStorage |
+| `shared/Lighting` | Hiệu ứng ánh sáng (thuộc tính Lighting nằm trong `default.project.json`) |
+
+**Sau khi sửa map trong Studio:**
+
+1. Ngắt Rojo (Disconnect + Stop server).
+2. Studio: **File → Download a Copy** → lưu đè `DreamLayers.rbxl` trong repo.
+3. Terminal: `aftman install` (lần đầu), rồi
+   ```
+   rojo syncback --input DreamLayers.rbxl --non-interactive
+   lune run tools/export-maps.luau
+   ```
+4. Commit + push.
+
+Map có nhiều đối tượng trùng tên (Desk, Wall…) nên `syncback` không tách được map; `tools/export-maps.luau` xuất map ra `.rbxm`.
+**Luôn syncback trước khi Connect Rojo**, nếu không Rojo sẽ ghi đè map trong Studio bằng bản cũ trong repo.

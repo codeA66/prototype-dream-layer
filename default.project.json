@@ -2,12 +2,89 @@
   "name": "DreamLayers",
   "tree": {
     "$className": "DataModel",
+    "Lighting": {
+      "$className": "Lighting",
+      "$properties": {
+        "Ambient": [
+          0.2823529541492462,
+          0.27450981736183167,
+          0.32156863808631897
+        ],
+        "Brightness": 0.5,
+        "EnvironmentDiffuseScale": 0.30000001192092896,
+        "EnvironmentSpecularScale": 0.5,
+        "FogColor": [
+          0.03921568766236305,
+          0.0313725508749485,
+          0.05882352963089943
+        ],
+        "GeographicLatitude": 0.0,
+        "GlobalShadows": true,
+        "OutdoorAmbient": [
+          0.22745098173618317,
+          0.22745098173618317,
+          0.27450981736183167
+        ],
+        "Outlines": false,
+        "PrioritizeLightingQuality": true,
+        "ShadowSoftness": 0.20000000298023224,
+        "Technology": "ShadowMap",
+        "TimeOfDay": "00:00:00"
+      },
+      "$path": "shared/Lighting"
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "DreamSounds": {
+        "$properties": {
+          "IconTint": {
+            "Color3": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "$path": "shared/DreamSounds"
+      },
+      "L2Ambience": {
+        "$path": "shared/L2Ambience.rbxm"
+      },
+      "Remotes": {
+        "$properties": {
+          "IconTint": {
+            "Color3": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "$path": "shared/Remotes"
+      }
+    },
     "ServerScriptService": {
       "$path": "src/ServerScriptService"
     },
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "$path": "src/StarterPlayer/StarterPlayerScripts"
+      },
+      "$properties": {
+        "AvatarJointUpgrade": "Enabled",
+        "CameraMaxZoomDistance": 128.0,
+        "CameraMode": "LockFirstPerson",
+        "CharacterBreakJointsOnDeath": false,
+        "CharacterUseJumpPower": false
+      }
+    },
+    "Workspace": {
+      "$className": "Workspace",
+      "DreamMap": {
+        "$path": "map/DreamMap.rbxm"
+      },
+      "DreamMap2": {
+        "$path": "map/DreamMap2.rbxm"
       }
     }
   }
