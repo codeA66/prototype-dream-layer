@@ -345,6 +345,11 @@ local rollBig = txt(gui, UDim2.new(0.5, -360, 0.3, 0), UDim2.fromOffset(720, 70)
 rollBig.TextXAlignment = Enum.TextXAlignment.Center rollBig.TextColor3 = Color3.fromRGB(255, 215, 150) rollBig.TextTransparency = 1 rollBig.TextStrokeTransparency = 1
 local pa = Instance.new("Sound") pa.SoundId = "rbxassetid://134681576227406" pa.Volume = 0.7 pa.Parent = gui
 local lastRoll = ""
+local rollToken = 0
+local function hideRollBig(instant)
+	if instant then rollBig.TextTransparency = 1 rollBig.TextStrokeTransparency = 1
+	else TweenService:Create(rollBig, TweenInfo.new(0.8), {TextTransparency = 1, TextStrokeTransparency = 1}):Play() end
+end
 State:GetAttributeChangedSignal("RollName"):Connect(function()
 	local rn = State:GetAttribute("RollName") or ""
 	local ph0 = State:GetAttribute("Phase") or ""
@@ -355,8 +360,17 @@ State:GetAttributeChangedSignal("RollName"):Connect(function()
 	rollBig.TextTransparency = 0 rollBig.TextStrokeTransparency = 0.2
 	local sc = rollBig:FindFirstChildOfClass("UIScale") or Instance.new("UIScale", rollBig) sc.Scale = 1.4
 	TweenService:Create(sc, TweenInfo.new(0.35, Enum.EasingStyle.Back), {Scale = 1}):Play()
-	task.delay(3, function() if lastRoll == rn then TweenService:Create(rollBig, TweenInfo.new(0.8), {TextTransparency = 1, TextStrokeTransparency = 1}):Play() end end)
+	rollToken += 1 local tk = rollToken
+	task.delay(3, function() if tk == rollToken then hideRollBig() end end) -- luôn mờ đi sau 3 giây, kể cả khi điểm danh đã kết thúc
 end)
+-- rời Tầng 1 / hết ván: ẩn ngay băng rôn điểm danh
+local function rollCheck()
+	local ph = State:GetAttribute("Phase") or ""
+	local on = plr:GetAttribute("Level") ~= 2 and (ph == "TrinhSat" or ph == "TruyNguyen" or ph == "ThanhTay" or ph == "Neo")
+	if not on then rollToken += 1 hideRollBig(true) lastRoll = "" end
+end
+plr:GetAttributeChangedSignal("Level"):Connect(rollCheck)
+State:GetAttributeChangedSignal("Phase"):Connect(rollCheck)
 local PLAYING = {TrinhSat = true, TruyNguyen = true, ThanhTay = true, Neo = true}
 RunService.RenderStepped:Connect(function()
 	local now = workspace:GetServerTimeNow()

@@ -991,7 +991,7 @@ Core.register(1, {
 	name = "Lớp Học Vỡ", start = resetRound, loseRestart = false,
 	tools = {"ToNoiQuy", "HopPhan", "SoDiem", "NhatKy"},
 	active = function() return not G("RoundOver") end,
-	sleep = function() S("RoundOver", true) S("Phase", "Away") setTask(nil) clearTaskItems() end,
+	sleep = function() S("RoundOver", true) S("Phase", "Away") setTask(nil) clearTaskItems() if roll then endRoll() end end,
 	onDream = onDream,
 	debug = { -- chỉ dùng khi test trong Studio
 		roll = function(ghost) return startRoll(ghost == true) end,
