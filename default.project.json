@@ -85,6 +85,9 @@
       },
       "DreamMap2": {
         "$path": "map/DreamMap2.rbxm"
+      },
+      "DreamMap3": {
+        "$path": "map/DreamMap3.rbxm"
       }
     }
   }

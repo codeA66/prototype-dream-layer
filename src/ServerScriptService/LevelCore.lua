@@ -419,6 +419,7 @@ function Core.castSkill(p, def)
 		if #revived > 0 then msg = msg .. ", kéo " .. table.concat(revived, ", ") .. " trở lại" end
 		msg = msg .. ". Sát thương giảm một nửa trong " .. R.lull .. " giây."
 		Core.notify(msg, mates)
+		if sk.onLull then sk.onLull(p, room) end -- tác dụng riêng của Bài Ru trong từng phòng
 	elseif role == "Anchor" then
 		-- lúc Cổng mở: CHỐNG CỬA (mỗi tầng 1 lần)
 		if G and G("Phase") == "Gate" and def.escape then

@@ -275,9 +275,9 @@ RunService.RenderStepped:Connect(function()
 	elseif ph == "Gate" then now_obj = plr:GetAttribute("Escaped") and "→ Đã qua Cổng, chờ đồng đội" or "→ Về SẢNH, bước vào Cổng!"
 	else now_obj = "" end
 	rNow.Text = now_obj
-	local L2 = plr:GetAttribute("Level") == 2
+	local L2 = (plr:GetAttribute("Level") or 1) > 1
 	panel.Visible = not L2
-	if ph == "Gate" and not plr:GetAttribute("Escaped") and plr:GetAttribute("Level") ~= 2 then
+	if ph == "Gate" and not plr:GetAttribute("Escaped") and (plr:GetAttribute("Level") or 1) == 1 then
 		local left = math.ceil((State:GetAttribute("EscapeDeadline") or 0) - now)
 		if left > 0 then
 			escL.Text = "⚠ CỬA ĐÓNG SAU " .. left .. "s — CHẠY VỀ SẢNH! ⚠"
@@ -289,7 +289,7 @@ RunService.RenderStepped:Connect(function()
 	else escL.Text = "" end
 	-- việc cô nhờ
 	local tt = State:GetAttribute("TaskText") or ""
-	if tt ~= "" and plr:GetAttribute("Level") ~= 2 then
+	if tt ~= "" and (plr:GetAttribute("Level") or 1) == 1 then
 		local left = math.max(0, math.ceil((State:GetAttribute("TaskDeadline") or 0) - now))
 		taskL.Text = "📝 " .. tt .. "  ·  " .. left .. "s"
 		taskL.TextColor3 = left <= 10 and Color3.fromRGB(255, 90, 90) or Color3.fromRGB(255, 200, 130)
@@ -329,7 +329,7 @@ do
 	RunService.RenderStepped:Connect(function()
 		local k2 = (math.sin(os.clock() * 3) + 1) / 2
 		for k, h in pairs(hl) do
-			local live = plr:GetAttribute("Level") ~= 2 and State:GetAttribute("SignLive_" .. k) == true and not State:GetAttribute("Sign_" .. k)
+			local live = (plr:GetAttribute("Level") or 1) == 1 and State:GetAttribute("SignLive_" .. k) == true and not State:GetAttribute("Sign_" .. k)
 			h.Enabled = live
 			if live then h.FillTransparency = 0.75 + 0.15 * k2 h.OutlineTransparency = 0.1 + 0.5 * k2 end
 		end
@@ -354,7 +354,7 @@ end
 State:GetAttributeChangedSignal("RollName"):Connect(function()
 	local rn = State:GetAttribute("RollName") or ""
 	local ph0 = State:GetAttribute("Phase") or ""
-	if rn == "" or rn == lastRoll or plr:GetAttribute("Level") == 2 or not (ph0 == "TrinhSat" or ph0 == "TruyNguyen" or ph0 == "ThanhTay" or ph0 == "Neo") then lastRoll = rn return end
+	if rn == "" or rn == lastRoll or (plr:GetAttribute("Level") or 1) > 1 or not (ph0 == "TrinhSat" or ph0 == "TruyNguyen" or ph0 == "ThanhTay" or ph0 == "Neo") then lastRoll = rn return end
 	lastRoll = rn
 	pcall(function() pa.TimePosition = 0 pa:Play() end)
 	rollBig.Text = rn == plr.DisplayName and "📢 CÔ GỌI TÊN BẠN!" or ("📢 CÔ ĐIỂM DANH: " .. string.upper(rn))
@@ -367,7 +367,7 @@ end)
 -- rời Tầng 1 / hết ván: ẩn ngay băng rôn điểm danh
 local function rollCheck()
 	local ph = State:GetAttribute("Phase") or ""
-	local on = plr:GetAttribute("Level") ~= 2 and (ph == "TrinhSat" or ph == "TruyNguyen" or ph == "ThanhTay" or ph == "Neo")
+	local on = (plr:GetAttribute("Level") or 1) == 1 and (ph == "TrinhSat" or ph == "TruyNguyen" or ph == "ThanhTay" or ph == "Neo")
 	if not on then rollToken += 1 hideRollBig(true) lastRoll = "" end
 end
 plr:GetAttributeChangedSignal("Level"):Connect(rollCheck)
@@ -376,7 +376,7 @@ local PLAYING = {TrinhSat = true, TruyNguyen = true, ThanhTay = true, Neo = true
 RunService.RenderStepped:Connect(function()
 	local now = workspace:GetServerTimeNow()
 	local ph = State:GetAttribute("Phase") or ""
-	local on = plr:GetAttribute("Level") ~= 2 and PLAYING[ph] == true
+	local on = (plr:GetAttribute("Level") or 1) == 1 and PLAYING[ph] == true
 	local pn = State:GetAttribute("Period") or 0
 	if on and pn > 0 then
 		local ends = State:GetAttribute("PeriodEndsAt") or 0
@@ -425,7 +425,7 @@ task.spawn(function()
 	while true do
 		task.wait(0.05)
 		local ph = State:GetAttribute("Phase") or ""
-		local want = plr:GetAttribute("Level") ~= 2 and (State:GetAttribute("Period") or 0) >= 3 and PLAYING[ph] == true
+		local want = (plr:GetAttribute("Level") or 1) == 1 and (State:GetAttribute("Period") or 0) >= 3 and PLAYING[ph] == true
 		if want and #ghosts == 0 then spawnGhosts() elseif not want and #ghosts > 0 then clear() end
 		local root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 		for _, g in ipairs(ghosts) do
@@ -451,7 +451,7 @@ task.spawn(function()
 		while true do
 			task.wait(math.random(3, 8) / (((State:GetAttribute("Period") or 1) >= 3) and 25 or 10)) -- tiết cuối: đèn chập chờn dữ hơn
 			local p = #flick > 0 and flick[math.random(#flick)]
-			if p and plr:GetAttribute("Level") ~= 2 then
+			if p and (plr:GetAttribute("Level") or 1) == 1 then
 				for i = 1, math.random(2, 5) do setOn(p, false) task.wait(math.random(3, 12) / 100) setOn(p, true) task.wait(math.random(3, 15) / 100) end
 			end
 		end

@@ -172,11 +172,11 @@ local function showDiary(which)
 end
 showDiaryRef = showDiary
 Remotes.Notify.OnClientEvent:Connect(function(msg) if msg == "__DIARY__" then showDiary() elseif msg == "__DIARY2__" then showDiary(2) end end)
-Remotes.Notify.OnClientEvent:Connect(function(msg) if msg == "__SHOW_RULES__" then showAllRules() elseif msg == "__L2RULES__" then note.Visible = false end end)
+Remotes.Notify.OnClientEvent:Connect(function(msg) if msg == "__SHOW_RULES__" then showAllRules() elseif msg == "__L2RULES__" or msg == "__L3RULES__" or msg == "__DIARY3__" then note.Visible = false end end)
 UIS.InputBegan:Connect(function(i, gp)
 	if gp then return end
-	-- Tầng 2 có tờ Hướng dẫn riêng (Level2Client): M ở đây chỉ để đóng tờ đang mở
-	if i.KeyCode == Enum.KeyCode.M and plr:GetAttribute("Level") == 2 then note.Visible = false return end
+	-- Tầng 2, 3 có tờ nội quy riêng (Level2Client, Level3Client): M ở đây chỉ để đóng tờ đang mở
+	if i.KeyCode == Enum.KeyCode.M and (plr:GetAttribute("Level") or 1) > 1 then note.Visible = false return end
 	if i.KeyCode == Enum.KeyCode.M then
 		if note.Visible then note.Visible = false
 		elseif plr:GetAttribute("HasRules") then showAllRules()

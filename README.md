@@ -4,6 +4,7 @@ Game kinh dị co-op trên Roblox. Cả nhóm bị kéo vào giấc mộng, ph�
 
 - **Tầng 1 — Lớp Học Vỡ:** Lớp học, Thư viện, Phòng nhạc
 - **Tầng 2 — Bệnh Viện Ngủ Quên:** Phẫu thuật, Đóng phí, Nhà xác, Phòng ô nhiễm
+- **Tầng 3 — Khu Rừng Mê:** Lửa trại (an toàn), Rừng đom đóm, Đầm sương mù, Cây cổ thụ có mắt, Hang gỗ mục, Vườn nấm phát sáng
 - **4 vai:** Thấu Thị, Chữa Lành, Người Neo, Nhà Bói Toán
 
 ## Cấu trúc code
@@ -14,12 +15,14 @@ src/
     LevelCore.lua              ModuleScript: hệ thống chung (Tỉnh táo, luật, kỹ năng, cổng, chuyển tầng)
     GameManager.server.lua     Sảnh + Tầng 1
     Level2Manager.server.lua   Tầng 2
+    Level3Manager.server.lua   Tầng 3
   StarterPlayer/StarterPlayerScripts/
     DreamClient.client.lua     HUD, thanh Tỉnh táo, Nhìn Xuyên
     DreamPolish.client.lua     Nút kỹ năng, điểm danh, tiết học, màn thắng/thua
     RoleFX.client.lua          Giới thiệu vai, lá quẻ, Neo/Ru, Sợi Chỉ Đỏ, Mắt Đêm
     RuleBook.client.lua        Sổ tay, nội quy Tầng 1, nhật ký
     Level2Client.client.lua    Giao diện Tầng 2
+    Level3Client.client.lua    Giao diện Tầng 3 (nội quy, nhật ký kiểm lâm, nín thở)
     Lobby.client.lua           Chọn vai
 docs/
   Luat_va_Gameplay_Tang1_Dream_Layers.docx
@@ -44,7 +47,7 @@ Repo chứa cả map và đối tượng, `rojo build -o DreamLayers.rbxl` dựn
 
 | Thư mục | Nội dung |
 |---|---|
-| `map/DreamMap.rbxm`, `map/DreamMap2.rbxm` | Map Tầng 1, Tầng 2 |
+| `map/DreamMap.rbxm`, `map/DreamMap2.rbxm`, `map/DreamMap3.rbxm` | Map Tầng 1, 2, 3 |
 | `shared/Remotes`, `shared/DreamSounds`, `shared/L2Ambience.rbxm` | ReplicatedStorage |
 | `shared/Lighting` | Hiệu ứng ánh sáng (thuộc tính Lighting nằm trong `default.project.json`) |
 
@@ -61,3 +64,9 @@ Repo chứa cả map và đối tượng, `rojo build -o DreamLayers.rbxl` dựn
 
 Map có nhiều đối tượng trùng tên (Desk, Wall…) nên `syncback` không tách được map; `tools/export-maps.luau` xuất map ra `.rbxm`.
 **Luôn syncback trước khi Connect Rojo**, nếu không Rojo sẽ ghi đè map trong Studio bằng bản cũ trong repo.
+
+### Map Tầng 3
+
+Bản đầu của `map/DreamMap3.rbxm` được dựng bằng script: `lune run tools/build-map3.luau` (ghi đè file map).
+Sau khi Builder đã sửa map Tầng 3 trong Studio thì **không chạy lại script này nữa**, mà xuất map theo các bước ở trên (`tools/export-maps.luau` đã có DreamMap3).
+Test nhanh Tầng 3 trong Studio: đặt thuộc tính Workspace `TestLevel = 3`.

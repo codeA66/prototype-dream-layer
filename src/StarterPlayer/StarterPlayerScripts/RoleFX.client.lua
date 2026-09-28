@@ -13,8 +13,14 @@ local Remotes = RS:WaitForChild("Remotes")
 local ST1 = RS:WaitForChild("GameState")
 local ST2 = RS:WaitForChild("GameState2")
 local function lvl() return plr:GetAttribute("Level") end
-local function ST() return lvl() == 2 and ST2 or ST1 end
-local function myRoom() return plr:GetAttribute(lvl() == 2 and "Room2" or "Room") end
+local function ST()
+	local l = lvl()
+	if l == 3 then return RS:FindFirstChild("GameState3") or ST1 end
+	return l == 2 and ST2 or ST1
+end
+local ROOM_ATTR = {[2] = "Room2", [3] = "Room3"}
+local MAP_NAME = {"DreamMap", "DreamMap2", "DreamMap3"}
+local function myRoom() return plr:GetAttribute(ROOM_ATTR[lvl() or 1] or "Room") end
 local function now() return workspace:GetServerTimeNow() end
 
 local gui = Instance.new("ScreenGui") gui.Name = "RoleFX" gui.ResetOnSpawn = false gui.IgnoreGuiInset = true gui.DisplayOrder = 12
@@ -36,14 +42,22 @@ local ROLE = {
 			{{"Trong mỗi phòng có luật", "Những bí mật và mốc giờ của riêng phòng đó — hãy tự khám phá"},
 			 {"Nơi không có luật (hành lang)", "Thấy vị trí mọi đồng đội và mọi hiểm nguy trên cả tầng · lộ ra dòng NÓI DỐI trong tờ nội quy"}},
 			{{"Trong mỗi phòng có luật", "Những bí mật và mốc giờ của riêng phòng đó — hãy tự khám phá"},
-			 {"Nơi không có luật (sảnh)", "Thấy vị trí mọi đồng đội và mọi hiểm nguy trên cả tầng · lộ ra dòng NÓI DỐI trong tờ hướng dẫn"}}}},
+			 {"Nơi không có luật (sảnh)", "Thấy vị trí mọi đồng đội và mọi hiểm nguy trên cả tầng · lộ ra dòng NÓI DỐI trong tờ hướng dẫn"}},
+			{{"Rừng đom đóm", "Lối đá thật (xanh) và cỏ cao (đỏ) · Mảnh Neo"},
+			 {"Đầm sương mù", "Những hòn đá và cây cầu an toàn · điểm thả la bàn"},
+			 {"Cây cổ thụ", "Cây Mắt và rễ phát sáng · vị trí la bàn gãy"},
+			 {"Hang gỗ mục", "Kẻ Gõ xuyên vách · các hốc tường an toàn · số tiếng gõ đúng"},
+			 {"Vườn nấm", "Vòng nấm trắng (an toàn) và vòng nấm đỏ"},
+			 {"Lửa trại (an toàn)", "Vị trí mọi đồng đội và hiểm nguy · dòng NÓI DỐI trong nội quy · đáp án trên phiến đá"}}}},
 	Healer = {icon = "♪", name = "CHỮA LÀNH", color = Color3.fromRGB(120, 230, 170),
 		stats = "Tỉnh táo tối đa 100 · Bài Ru: tốn 5, hồi 30 giây",
 		skill = "<b>BÀI RU (Q)</b> — mọi người trong phòng (cả bạn) <b>+25 Tỉnh táo</b>, <b>Bình tâm 12 giây</b> (miễn 1 lần phạt), kéo <b>TẤT CẢ</b> người Hòa Mộng trong phòng dậy. Trong <b>3 giây</b> sau đó, mọi sát thương lên họ <b>chỉ còn một nửa</b>.",
 		passive = "<b>SỢI CHỈ ĐỎ</b> — bạn gánh <b>MỘT NỬA</b> mỗi lần phạt luật của đồng đội được nối, dù ở khác phòng. Đứng cạnh một đồng đội 2 giây để nối sang người đó.\nNgoài ra: đứng gần bạn là hồi Tỉnh táo; bạn thấy Tỉnh táo của cả nhóm.",
 		rooms = {
 			{{"Mọi nơi", "Tác dụng lên mọi người đang ở CÙNG PHÒNG với bạn lúc hát"}},
-			{{"Mọi nơi", "Tác dụng lên mọi người đang ở CÙNG PHÒNG với bạn lúc hát"}}}},
+			{{"Mọi nơi", "Tác dụng lên mọi người đang ở CÙNG PHÒNG với bạn lúc hát"}},
+			{{"Mọi nơi", "Tác dụng lên mọi người đang ở CÙNG PHÒNG với bạn lúc hát"},
+			 {"Trong mỗi phòng có luật", "Thêm: phòng giữ trạng thái an toàn lâu hơn 8 giây (đom đóm sáng · chuông im · cây nhắm mắt · Kẻ Gõ chậm lại · nấm ngủ)"}}}},
 	Anchor = {icon = "⚓", name = "NGƯỜI NEO", color = Color3.fromRGB(120, 180, 240),
 		stats = "Tỉnh táo tối đa 110 · Cắm Neo: tốn 8, kéo dài 5 giây, hồi 40 giây",
 		skill = "<b>CẮM NEO (Q)</b> — mọi thứ đang chuyển động trong <b>PHÒNG</b> đứng yên đúng như lúc bấm, đồng hồ sự kiện của phòng dừng lại. Neo khóa cả trạng thái XẤU — hãy chọn đúng lúc!\nKhi <b>CỔNG mở</b>: <b>CHỐNG CỬA</b> — cửa đóng chậm thêm 5 giây (1 lần mỗi tầng).",
@@ -52,6 +66,8 @@ local ROLE = {
 			{{"Trong mỗi phòng có luật", "Mọi thứ đứng yên 5 giây"},
 			 {"Nơi không có luật", "Không có gì để neo — trừ lúc Cổng mở: Chống cửa"}},
 			{{"Trong mỗi phòng có luật", "Mọi thứ đứng yên 5 giây"},
+			 {"Nơi không có luật", "Không có gì để neo — trừ lúc Cổng mở: Chống cửa"}},
+			{{"Trong mỗi phòng có luật", "Mọi thứ đứng yên 5 giây: đom đóm, chuông gió, Cây Mắt, Kẻ Gõ, nấm"},
 			 {"Nơi không có luật", "Không có gì để neo — trừ lúc Cổng mở: Chống cửa"}}}},
 	Diviner = {icon = "🔮", name = "NHÀ BÓI TOÁN", color = Color3.fromRGB(235, 195, 110),
 		stats = "Tỉnh táo tối đa 100 · Gieo Quẻ: tốn 5, hồi 30 giây",
@@ -61,7 +77,9 @@ local ROLE = {
 			{{"Trong mỗi phòng có luật", "Báo trước sự kiện kế tiếp của phòng đó"},
 			 {"Nơi không có luật", "Báo tiến độ của cả nhóm và những gì còn thiếu"}},
 			{{"Trong mỗi phòng có luật", "Báo trước sự kiện kế tiếp của phòng đó"},
-			 {"Nơi không có luật", "Báo trước điều sắp xảy ra với cả nhóm"}}}},
+			 {"Nơi không có luật", "Báo trước điều sắp xảy ra với cả nhóm"}},
+			{{"Trong mỗi phòng có luật", "Báo trước sự kiện kế tiếp của phòng (hang: hốc tường gần nhất · vườn nấm: vòng nấm trắng)"},
+			 {"Lửa trại", "Báo tiến độ của cả nhóm và những gì còn thiếu"}}}},
 }
 ROLE_INFO = ROLE -- để script khác (Lớp/Sổ tay) có thể dùng chung nếu cần
 
@@ -82,7 +100,7 @@ local iBtn = Instance.new("TextButton", intro) iBtn.AnchorPoint = Vector2.new(0.
 iBtn.Font = Enum.Font.GothamBlack iBtn.TextSize = 17 iBtn.TextColor3 = Color3.new(1, 1, 1) iBtn.Text = "ĐÃ HIỂU (V để xem lại)" iBtn.Modal = true iBtn.ZIndex = 41
 Instance.new("UICorner", iBtn).CornerRadius = UDim.new(0, 10)
 iBtn.MouseButton1Click:Connect(function() intro.Visible = false end)
-local LEVEL_NAME = {"TẦNG 1 — LỚP HỌC VỠ", "TẦNG 2 — BỆNH VIỆN NGỦ QUÊN"}
+local LEVEL_NAME = {"TẦNG 1 — LỚP HỌC VỠ", "TẦNG 2 — BỆNH VIỆN NGỦ QUÊN", "TẦNG 3 — KHU RỪNG MÊ"}
 local function hex(c) return string.format("#%02X%02X%02X", c.R * 255, c.G * 255, c.B * 255) end
 local function showIntro()
 	local r = ROLE[plr:GetAttribute("Role") or ""] local l = lvl()
@@ -178,6 +196,7 @@ end
 local OMEN = {
 	[1] = {Class = {"TeacherTurnAt"}, East = {"MusicChangeAt"}},
 	[2] = {Surgery = {"OpLightAt"}, Morgue = {"MorgueDarkAt"}, Billing = {"QueueZeroAt"}},
+	[3] = {Room1 = {"FireflyOffAt"}, Room2 = {"ChimeAt"}, Room3 = {"EyeOpenAt"}, Room4 = {"KnockPassAt"}, Room5 = {"SporeAt"}},
 }
 local omenDone = {}
 local lastOmen = -999 -- Điềm Báo: tối đa 1 lần mỗi 60 giây
@@ -227,6 +246,7 @@ end
 local ENEMIES = {
 	[1] = function() local m = workspace:FindFirstChild("DreamMap") if not m then return {} end local IX = m.Interactables return {IX:FindFirstChild("Teacher"), IX:FindFirstChild("Librarian"), IX:FindFirstChild("Puppet")} end,
 	[2] = function() local m = workspace:FindFirstChild("DreamMap2") if not m then return {} end local IX = m.Interactables return {IX:FindFirstChild("Doctor"), IX:FindFirstChild("Keeper"), IX:FindFirstChild("PatientZero")} end,
+	[3] = function() local m = workspace:FindFirstChild("DreamMap3") if not m then return {} end local IX = m.Interactables return {IX:FindFirstChild("EyeTree"), IX:FindFirstChild("Knocker"), IX:FindFirstChild("Chime")} end,
 }
 
 RunService.RenderStepped:Connect(function()
@@ -263,7 +283,7 @@ RunService.RenderStepped:Connect(function()
 	local mine = role == "Seer" and (plr:GetAttribute("TrueSightUntil") or 0) > t
 	local team = l and (st:GetAttribute("SeerMarkUntil") or 0) > t
 	local sRoom = mine and plr:GetAttribute("SightRoom") or (team and st:GetAttribute("SeerMarkRoom"))
-	local floorView = l and (mine or team) and ((l == 1 and sRoom == "Hall") or (l == 2 and sRoom == "Lobby"))
+	local floorView = l and (mine or team) and ((l == 1 and sRoom == "Hall") or (l ~= 1 and sRoom == "Lobby"))
 	for _, o in ipairs(Players:GetPlayers()) do if o ~= plr then setHL("p" .. o.UserId, o.Character, floorView, Color3.fromRGB(120, 255, 170)) end end
 	local ens = l and ENEMIES[l] and ENEMIES[l]() or {}
 	for i = 1, 3 do setHL("e" .. i, ens[i], floorView and ens[i] ~= nil, Color3.fromRGB(255, 90, 90)) end
@@ -271,12 +291,15 @@ RunService.RenderStepped:Connect(function()
 	local root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
 	local seerEye = role == "Seer" and root and not plr:GetAttribute("Dreaming") and l
 	local loot = {}
-	if seerEye and not workspace:FindFirstChild(l == 1 and "DreamMap" or "DreamMap2") then seerEye = false end -- map đang được làm mới
+	if seerEye and not workspace:FindFirstChild(MAP_NAME[l] or "") then seerEye = false end -- map đang được làm mới
 	if seerEye then
 		if l == 1 then
 			local IX = workspace.DreamMap.Interactables
 			for _, n in ipairs({"Shard1", "Shard2", "Shard3", "Chalk", "TaskBook", "Notebook", "Diary"}) do local x = IX:FindFirstChild(n) if x and x.Transparency < 1 then table.insert(loot, x) end end
 			for _, it in ipairs(workspace.DreamMap.Items:GetChildren()) do table.insert(loot, it) end
+		elseif l == 3 then
+			local IX = workspace.DreamMap3.Interactables
+			for _, n in ipairs({"AnchorShard1", "AnchorShard2", "AnchorShard3", "Compass", "RangerLog", "RulesPaper"}) do local x = IX:FindFirstChild(n) if x and x.Transparency < 1 then table.insert(loot, x) end end
 		else
 			local IX = workspace.DreamMap2.Interactables
 			for _, n in ipairs({"ShardDoctor", "ShardBuy", "IVBag", "NightLog"}) do local x = IX:FindFirstChild(n) if x and x.Transparency < 1 then table.insert(loot, x) end end

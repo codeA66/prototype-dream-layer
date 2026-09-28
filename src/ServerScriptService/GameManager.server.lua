@@ -935,7 +935,8 @@ task.spawn(function()
 			for _, p in ipairs(plist) do if not (p:GetAttribute("Role") and p:GetAttribute("Ready")) then allReady = false end end
 			if allReady then
 				if (G("LobbyStartAt") or 0) == 0 then S("LobbyStartAt", workspace:GetServerTimeNow() + 4) end
-				if workspace:GetServerTimeNow() >= G("LobbyStartAt") then S("LobbyStartAt", 0) Core.startLevel(1) end
+				-- Studio: thuộc tính Workspace TestLevel = n → chọn vai xong vào thẳng Tầng n
+				if workspace:GetServerTimeNow() >= G("LobbyStartAt") then S("LobbyStartAt", 0) Core.startLevel(Core.testLevel() or 1) end
 			elseif (G("LobbyStartAt") or 0) ~= 0 then S("LobbyStartAt", 0) end
 		end
 	end
@@ -1021,8 +1022,7 @@ do
 	local SSv = game:GetService("ServerStorage")
 	local back = SSv:FindFirstChild("BackToLobby") or Instance.new("BindableEvent", SSv) back.Name = "BackToLobby"
 	back.Event:Connect(function() Core.toLobby() end)
-	local tl = Core.testLevel()
-	if not BOOT and tl and tl ~= 1 then S("RoundOver", true) S("Phase", "Away") task.delay(3, function() Core.startLevel(tl) end) end
+	-- TestLevel không còn tự vào màn: vẫn chọn vai ở sảnh như bình thường, sẵn sàng xong mới vào Tầng TestLevel
 end
 while true do
 	task.wait(TICK)
