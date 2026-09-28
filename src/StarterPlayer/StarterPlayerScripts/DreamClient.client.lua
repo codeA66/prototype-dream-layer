@@ -93,7 +93,7 @@ local function pushMsg(msg, color)
 	t.AutomaticSize = Enum.AutomaticSize.Y t.TextStrokeTransparency = 0.6 if color then t.TextColor3 = color end
 	task.delay(5, function() t:Destroy() end)
 end
-Remotes.Notify.OnClientEvent:Connect(function(msg) if msg ~= "__SHOW_RULES__" and msg ~= "__DIARY__" and msg ~= "__DIARY2__" and msg:sub(1, 10) ~= "__MEMORY__" and msg:sub(1, 9) ~= "__DANCE__" then pushMsg(msg) end end)
+Remotes.Notify.OnClientEvent:Connect(function(msg) if typeof(msg) == "string" and msg:sub(1, 2) ~= "__" then pushMsg(msg) end end) -- "__...__" là lệnh cho giao diện, không hiện ra bảng tin
 
 local cc = Instance.new("ColorCorrectionEffect") cc.Name = "DreamHUD_CC" cc.Parent = Lighting
 
@@ -232,7 +232,7 @@ RunService.RenderStepped:Connect(function()
 	-- Thau Thi
 	local mineSight = role == "Seer" and (plr:GetAttribute("TrueSightUntil") or 0) > now
 	local teamSight = (State:GetAttribute("SeerMarkUntil") or 0) > now -- Đánh Dấu: cả nhóm thấy những gì Thấu Thị soi
-	local sight = (mineSight or teamSight) and plr:GetAttribute("Level") ~= 2
+	local sight = (mineSight or teamSight) and (plr:GetAttribute("Level") or 1) == 1
 	local myRoom = plr:GetAttribute("Room")
 	-- Nhìn Xuyên chỉ soi PHÒNG lúc dùng kỹ năng
 	local sRoom = mineSight and (plr:GetAttribute("SightRoom") or myRoom) or State:GetAttribute("SeerMarkRoom")
@@ -240,7 +240,7 @@ RunService.RenderStepped:Connect(function()
 		if x < -50.5 and math.abs(z) < 30.5 then return "West" elseif x > 50.5 and math.abs(z) < 30.5 then return "East"
 		elseif math.abs(x) < 50.5 and z > -35.5 and z < 35.5 then return "Class" elseif z >= 35.5 then return "Hall" end return "None" end
 	local function here(inst) local p = inst:IsA("Model") and inst:GetPivot().Position or inst.Position return roomOfPos(p) == sRoom end
-	shadowBox.Visible = role == "Seer" and plr:GetAttribute("Level") ~= 2 and myRoom == "Class" and not State:GetAttribute("Sign_Shadow") and phase == "TrinhSat"
+	shadowBox.Visible = role == "Seer" and (plr:GetAttribute("Level") or 1) == 1 and myRoom == "Class" and not State:GetAttribute("Sign_Shadow") and phase == "TrinhSat"
 	shadowBox.Transparency = (sight and sRoom == "Class") and 0.1 or 0.75
 	stalkerHL.Enabled = sight and State:GetAttribute("StalkerActive") == true
 	clockGui.Enabled = sight and mineSight and sRoom == "Class" and phase == "TruyNguyen" and seerHours ~= nil

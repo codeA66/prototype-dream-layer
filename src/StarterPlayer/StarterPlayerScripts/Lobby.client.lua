@@ -56,9 +56,12 @@ ready.MouseButton1Click:Connect(function() Remotes.UseSkill:FireServer("Ready") 
 local status = txt(bg, UDim2.new(0, 0, 0.9, 8), UDim2.new(1, 0, 0, 24), "", 16, Enum.Font.GothamBold)
 
 RunService.RenderStepped:Connect(function()
-	local inLobby = State:GetAttribute("Phase") == "Lobby" and not workspace:GetAttribute("TestLevel2")
+	local inLobby = State:GetAttribute("Phase") == "Lobby"
 	bg.Visible = inLobby
 	if not inLobby then return end
+	local tl = RunService:IsStudio() and (workspace:GetAttribute("TestLevel") or (workspace:GetAttribute("TestLevel2") and 2))
+	sub.Text = "Mỗi người một vai, không trùng nhau. Tất cả bấm SẴN SÀNG để bắt đầu."
+		.. ((type(tl) == "number" and tl > 1) and ("  (TEST: vào thẳng Tầng " .. tl .. ")") or "")
 	local owners = {}
 	local total, readyN = 0, 0
 	for _, p in ipairs(Players:GetPlayers()) do

@@ -9,4 +9,5 @@ local function save(inst, path)
 end
 save(game.Workspace.DreamMap, "map/DreamMap.rbxm")
 save(game.Workspace.DreamMap2, "map/DreamMap2.rbxm")
+save(game.Workspace.DreamMap3, "map/DreamMap3.rbxm")
 save(game.ReplicatedStorage.L2Ambience, "shared/L2Ambience.rbxm")
